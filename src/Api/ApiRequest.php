@@ -25,7 +25,7 @@ class ApiRequest {
     /** The user agent to send along with requests
      * @var string
      **/
-    public $user_agent ='Monetivo';
+    public $user_agent = 'Monetivo';
 
     /** API base uri
      * @var

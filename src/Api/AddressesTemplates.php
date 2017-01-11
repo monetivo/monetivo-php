@@ -3,6 +3,7 @@
 namespace Monetivo\Api;
 
 use Monetivo\Exceptions\MonetivoException;
+use Monetivo\Interfaces\ApiInterface;
 use Monetivo\MerchantApi;
 
 /**
@@ -10,7 +11,7 @@ use Monetivo\MerchantApi;
  * @author Jakub Jasiulewicz <jjasiulewicz@monetivo.com>
  * @package Monetivo\Api
  */
-class AddressesTemplates
+class AddressesTemplates implements ApiInterface
 {
     /**
      * @var MerchantApi

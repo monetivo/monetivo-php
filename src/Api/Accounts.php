@@ -2,6 +2,7 @@
 
 namespace Monetivo\Api;
 
+use Monetivo\Interfaces\ApiInterface;
 use Monetivo\Exceptions\MonetivoException;
 use Monetivo\MerchantApi;
 
@@ -10,7 +11,7 @@ use Monetivo\MerchantApi;
  * @author Jakub Jasiulewicz <jjasiulewicz@monetivo.com>
  * @package Monetivo\Api
  */
-class Accounts
+class Accounts implements ApiInterface
 {
     /**
      * Report types

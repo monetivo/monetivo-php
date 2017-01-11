@@ -3,6 +3,7 @@
 namespace Monetivo\Api;
 
 use Monetivo\Interfaces\ApiInterface;
+use Monetivo\MerchantApi;
 
 /**
  * Class Payouts

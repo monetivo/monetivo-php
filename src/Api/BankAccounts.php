@@ -2,6 +2,7 @@
 
 namespace Monetivo\Api;
 
+use Monetivo\Interfaces\ApiInterface;
 use Monetivo\MerchantApi;
 
 /**
@@ -9,7 +10,7 @@ use Monetivo\MerchantApi;
  * @author Jakub Jasiulewicz <jjasiulewicz@monetivo.com>
  * @package Monetivo\Api
  */
-class BankAccounts
+class BankAccounts implements ApiInterface
 {
     /**
      * @var MerchantApi
