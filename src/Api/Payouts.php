@@ -25,6 +25,7 @@ class Payouts implements ApiInterface
     /** Creates the payout for a given account
      * @param $account_id
      * @return mixed
+     * @throws \Monetivo\Exceptions\MonetivoException
      */
     public function create($account_id)
     {
@@ -35,6 +36,7 @@ class Payouts implements ApiInterface
 
     /** Lists all payouts
      * @return mixed
+     * @throws \Monetivo\Exceptions\MonetivoException
      */
     public function list()
     {
@@ -44,6 +46,7 @@ class Payouts implements ApiInterface
     /** Gets details about payout
      * @param $identifier
      * @return mixed
+     * @throws \Monetivo\Exceptions\MonetivoException
      */
     public function details($identifier)
     {

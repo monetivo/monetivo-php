@@ -42,7 +42,7 @@ class Transactions implements ApiInterface
      * {
      *      // your code goes here
      * }
-     * @see DOCS_URL For transaction response reference
+     * @see https://docs.monetivo.com/ For transaction response reference
      * @param null $identifier Identifier of the transaction (optional)
      * @return array|bool
      */
@@ -70,7 +70,6 @@ class Transactions implements ApiInterface
      * @param array $params
      * @return array
      * @throws MonetivoException
-     * @see DOCS_URL
      */
     public function create(array $params = [])
     {

@@ -62,7 +62,7 @@ catch(Monetivo\Exceptions\MonetivoException $e) {
 
 ## Documentation
 
-This is just a README so please see URL for up-to-date documentation.
+This is just a README so please see https://docs.monetivo.com/ for up-to-date documentation.
 
 ## Issues
 

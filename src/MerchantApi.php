@@ -21,7 +21,7 @@ use Monetivo\Exceptions\MonetivoException;
  * Monetivo Merchant API client
  * @author Grzegorz Agaciński <gagacinski@monetivo.com>
  * @author Jakub Jasiulewicz <jjasiulewicz@monetivo.com>
- * @see  DOCS_URL For further reference
+ * @see  https://docs.monetivo.com/
  * @package Monetivo
  */
 class MerchantApi
@@ -215,7 +215,7 @@ class MerchantApi
     /** Issues cutomized requests to API (low-level)
      * @param string $method HTTP request method post/get/put/delete etc.
      * @param string $route Relative to endpoint url
-     * @param array $params Request options @see http://docs.guzzlephp.org/en/latest/request-options.html
+     * @param array $params Request options
      * @return ApiResponse
      * @throws MonetivoException
      */
@@ -290,7 +290,7 @@ class MerchantApi
     }
 
     /** Handles Monetivo ping notification
-     * @see Transactions::handle()
+     * @see Transactions::handleCallback()
      * @param null $identifier
      * @return array|bool
      */

@@ -26,7 +26,7 @@ class Offer implements ApiInterface
 
     /** Lists active offers depending on their type
      * @param $type
-     * @return ApiResponse
+     * @return array
      * @throws \Monetivo\Exceptions\MonetivoException
      */
     public function list($type)
@@ -37,7 +37,7 @@ class Offer implements ApiInterface
     /** Gets details about an offer
      * @param string $type type of an offer
      * @param string $id id of an offer
-     * @return ApiResponse
+     * @return array
      * @throws \Monetivo\Exceptions\MonetivoException
      */
     public function details($type, $id)
