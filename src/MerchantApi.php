@@ -8,7 +8,6 @@ use Monetivo\Api\AddressesTemplates;
 use Monetivo\Api\ApiRequest;
 use Monetivo\Api\ApiResponse;
 use Monetivo\Api\BankAccounts;
-use Monetivo\Api\Channels;
 use Monetivo\Api\Contacts;
 use Monetivo\Api\ContactsTemplates;
 use Monetivo\Api\Offer;
@@ -30,7 +29,7 @@ class MerchantApi
     /**
      * Merchant API client version
      */
-    const CLIENT_VERSION = '1.0.0';
+    const CLIENT_VERSION = '1.0.3';
 
     /**
      * Name of request headers
@@ -38,10 +37,13 @@ class MerchantApi
     const APP_TOKEN_HEADER = 'X-API-Token';
     const AUTH_TOKEN_HEADER = 'X-Auth-Token';
     const LANG_HEADER = 'X-API-Language';
+    const TIMEZONE_HEADER = 'X-API-Timezone';
 
-    const USER_AGENT = 'MonetivoMerchantApi/v';
+    const USER_AGENT = 'monetivo/monetivo-php';
 
     const APP_TOKEN_VALIDATION_REGEX = '/^[a-f0-9]{8}-[a-f0-9]{4}-4{1}[a-f0-9]{3}-[89ab]{1}[a-f0-9]{3}-[a-f0-9]{12}$/';
+
+    const DEFAULT_TIMEZONE = 'Europe/Warsaw';
 
     /**
      * Monetivo Merchant API endpoint URL
@@ -80,7 +82,12 @@ class MerchantApi
      */
     private $language = 'en';
     /**
-     * @var ApiRequest $api_client Guzzle HTTP client handler
+     * @var string API response timezone
+     * @see https://secure.php.net/manual/en/timezones.php
+     */
+    private $timezone = self::DEFAULT_TIMEZONE;
+    /**
+     * @var ApiRequest $api_client HTTP client handler
      */
     private $api_client;
 
@@ -88,14 +95,15 @@ class MerchantApi
      * MerchantApi constructor
      * @param string $app_token
      * @param string $language
-     * @param null $custom_handler
+     * @param string $timezone See https://secure.php.net/manual/en/timezones.php
      * @throws MonetivoException
      */
-    public function __construct($app_token = '', $language = 'pl', $custom_handler = null)
+    public function __construct($app_token = '', $language = 'pl', $timezone = self::DEFAULT_TIMEZONE)
     {
         $this->setAppToken($app_token);
         $this->setLanguage($language);
-        $this->initClient($custom_handler);
+        $this->setTimezone($timezone);
+        $this->initClient();
     }
 
     /** Returns full URL to the API
@@ -103,7 +111,7 @@ class MerchantApi
      */
     public function getBaseAPIEndpoint()
     {
-        return self::API_ENDPOINT . 'v' . $this->api_version.'/';
+        return self::API_ENDPOINT . 'v' . $this->api_version . '/';
     }
 
     /** Sets target API version
@@ -154,21 +162,46 @@ class MerchantApi
         $this->language = in_array($language, self::$supported_langs) ? $language : 'en';
     }
 
+    /** Sets desired timezone
+     * @param string $timezone
+     * @throws MonetivoException
+     */
+    public function setTimezone($timezone)
+    {
+        try {
+            $test = new \DateTimeZone($timezone);
+            $this->timezone = $timezone;
+        } catch (\Exception $e) {
+            throw new MonetivoException('Invalid timezone');
+        }
+    }
+
     /**
-     * Initialize API client with default params
+     * Initialize API client with custom params and custom handler, both null by default
+     * @param array $custom_params See ApiRequest->setOptions()
+     * Main usage - provide Monetivo with ecomm platform:
+     *      $custom_params = [
+     *          'headers' => [
+     *              'Platform-Name' => '',
+     *              'Platform-Version' => ''
+     *          ]
+     *      ];
      * @param null $custom_handler
      */
-    public function initClient($custom_handler = null)
+    public function initClient($custom_params = [], $custom_handler = null)
     {
         $config = [
             'base_uri' => $this->getBaseAPIEndpoint(),
-            'headers' => [
-                'Accept' => 'application/json',
-                'User-Agent' => self::USER_AGENT . self::CLIENT_VERSION,
+            'headers'  => [
+                'Accept'               => 'application/json',
+                'User-Agent'           => self::USER_AGENT . ' ' . self::CLIENT_VERSION,
                 self::APP_TOKEN_HEADER => $this->app_token,
-                self::LANG_HEADER => $this->language
+                self::LANG_HEADER      => $this->language,
+                self::TIMEZONE_HEADER  => $this->timezone
             ]
         ];
+
+        $config = array_merge($config, $custom_params);
 
         $this->api_client = new ApiRequest($config);
     }
@@ -191,7 +224,7 @@ class MerchantApi
     {
         $response = $this->call('post', 'auth/login', [
             'form_params' => [
-                'login' => $login,
+                'login'    => $login,
                 'password' => $password
             ]
         ]);
@@ -221,16 +254,16 @@ class MerchantApi
      */
     public function call($method, $route, $params = [])
     {
-        if (!$this->api_client instanceof ApiRequest) {
+        if(!$this->api_client instanceof ApiRequest) {
             throw new MonetivoException('Client not initialized');
         }
 
-        if (!is_callable('ApiRequest', $method)) {
+        if(!is_callable('ApiRequest', $method)) {
             throw new MonetivoException('Method not implemented in the client');
         }
 
         // if we have auth_token, then include it in the request
-        if (!empty($this->auth_token)) {
+        if(!empty($this->auth_token)) {
             $params = array_merge($params, [
                 'headers' => [
                     self::AUTH_TOKEN_HEADER => $this->auth_token

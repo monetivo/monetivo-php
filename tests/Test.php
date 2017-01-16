@@ -45,6 +45,15 @@ class MerchantApiTest extends PHPUnit_Framework_TestCase
 
     /**
      * @expectedException ErrorException
+     * @expectedExceptionMessage Invalid timezone
+     */
+    public function testInitWithInvalidTimezone()
+    {
+        $api = new MerchantApi(self::TEST_APP_TOKEN, 'en', 'None/Existent');
+    }
+
+    /**
+     * @expectedException ErrorException
      * @expectedExceptionMessage API error: API token invalid
      */
     public function testAuthWithInvalidAppToken()
@@ -53,7 +62,8 @@ class MerchantApiTest extends PHPUnit_Framework_TestCase
             new Response(401, [], '{"code":"401","message":"API token invalid"}')
         ]);
 
-        $api = new MerchantApi(self::TEST_APP_TOKEN, 'pl', $mockHandler);
+        $api = new MerchantApi(self::TEST_APP_TOKEN, 'pl', MerchantApi::DEFAULT_TIMEZONE);
+        $api->initClient([],$mockHandler);
         $api->Auth('dummyuser', 'dummypass');
     }
 
@@ -67,7 +77,8 @@ class MerchantApiTest extends PHPUnit_Framework_TestCase
             new Response(401, [], '{"code":"401","message":"Unauthorized access"}')
         ]);
 
-        $api = new MerchantApi(self::TEST_APP_TOKEN, 'pl', $mockHandler);
+        $api = new MerchantApi(self::TEST_APP_TOKEN, 'pl');
+        $api->initClient([], $mockHandler);
         $api->Auth('dummyuser', 'dummypass');
     }
 
@@ -81,7 +92,8 @@ class MerchantApiTest extends PHPUnit_Framework_TestCase
             new Response(200, [], '{"user":null,"token":"validdummytoken"}')
         ]);
 
-        $api = new MerchantApi(self::TEST_APP_TOKEN, 'pl', $mockHandler);
+        $api = new MerchantApi(self::TEST_APP_TOKEN, 'pl');
+        $api->initClient([],$mockHandler);
         $api->Auth('dummyuser', 'dummypass');
         $api->CreateTransaction();
     }
