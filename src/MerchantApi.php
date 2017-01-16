@@ -273,6 +273,7 @@ class MerchantApi
 
         /** @var ApiResponse $response */
         $response = $this->api_client->$method(ltrim($route, '/'), $params);
+        $this->autoRenewAuthToken($response);
 
         // throw an exception if response was not 2xx
         if($response->isOK() === false) {
@@ -281,6 +282,20 @@ class MerchantApi
 
         return $response;
 
+    }
+
+    /** Sets freshly generated token if previous token expired
+     * The new token comes from server's response - server automatically checks if the date of current token is approaching expiration
+     * @param ApiResponse $response
+     * @param string $header
+     * @throws \Monetivo\Exceptions\MonetivoException
+     */
+    private function autoRenewAuthToken(ApiResponse $response, $header = 'X-Auth-Token')
+    {
+        $headers = $response->getHeaders();
+        if(!empty($headers[$header])) {
+            $this->setAuthToken($headers[$header]);
+        }
     }
 
     /**
