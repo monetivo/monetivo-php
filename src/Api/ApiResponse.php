@@ -13,10 +13,15 @@ use Monetivo\Exceptions\MonetivoException;
  */
 class ApiResponse implements JsonSerializable, ArrayAccess
 {
-    /** Parsed response
+    /** Parsed body
      * @var
      */
-    private $response = array();
+    private $body = array();
+
+    /** Parsed headers
+     * @var array
+     */
+    private $headers = array();
 
     /** HTTP status code
      * @var
@@ -25,8 +30,31 @@ class ApiResponse implements JsonSerializable, ArrayAccess
 
     public function __construct($headers, $body, $httpCode)
     {
-        $this->parseResponse($body, $httpCode);
+        $this->parseHeaders($headers);
+        $this->parseBody($body, $httpCode);
         $this->httpCode = $httpCode;
+    }
+
+    /** Parses headers to an array
+     * @param $headers
+     */
+    private function parseHeaders($headers)
+    {
+        $headers_temp = array();
+
+        $requests = explode("\r\n\r\n", $headers);
+        // follow eventual redirections
+        for ($index = 0; $index < count($requests) - 1; $index++) {
+
+            foreach (explode("\r\n", $requests[$index]) as $i => $line) {
+                if ($i === 0)
+                    continue;
+                list($key, $value) = explode(': ', $line);
+                $headers_temp[$index][$key] = $value;
+            }
+        }
+        // gets always the latest response
+        $this->headers = end($headers_temp) !== false ? end($headers_temp) : [];
     }
 
     /** Parses the response to an array
@@ -34,9 +62,9 @@ class ApiResponse implements JsonSerializable, ArrayAccess
      * @param $httpCode
      * @throws MonetivoException
      */
-    private function parseResponse($response, $httpCode)
+    private function parseBody($response, $httpCode)
     {
-        if(!is_string($response)) {
+        if (!is_string($response)) {
             return;
         }
 
@@ -45,7 +73,7 @@ class ApiResponse implements JsonSerializable, ArrayAccess
             throw new MonetivoException('API response is malformed: ' . json_last_error_msg(), 0, $httpCode, $response);
         }
 
-        $this->response = $parsed;
+        $this->body = $parsed;
     }
 
     /** Checks if the response is successful (2xx)
@@ -78,7 +106,7 @@ class ApiResponse implements JsonSerializable, ArrayAccess
      */
     public function toArray()
     {
-        return array_merge($this->response, ['httpCode' => $this->getHttpCode()]);
+        return array_merge($this->body, ['httpCode' => $this->getHttpCode()]);
     }
 
     /** Returns HTTP status code
@@ -89,35 +117,12 @@ class ApiResponse implements JsonSerializable, ArrayAccess
         return $this->httpCode;
     }
 
-    /**
-     * Whether a offset exists
-     * @link http://php.net/manual/en/arrayaccess.offsetexists.php
+    /** Returns response headers
+     * @return array
      */
-    public function offsetExists($offset)
+    public function getHeaders()
     {
-        return isset($this->response[$offset]);
-    }
-
-    /**
-     * Offset to retrieve
-     * @link http://php.net/manual/en/arrayaccess.offsetget.php
-     */
-    public function offsetGet($offset)
-    {
-        return isset($this->response[$offset]) ? $this->response[$offset] : null;
-    }
-
-    /**
-     * Offset to set
-     * @link http://php.net/manual/en/arrayaccess.offsetset.php
-     */
-    public function offsetSet($offset, $value)
-    {
-        if ($offset === null) {
-            $this->response[] = $value;
-        } else {
-            $this->response[$offset] = $value;
-        }
+        return $this->headers;
     }
 
     /**
@@ -126,7 +131,7 @@ class ApiResponse implements JsonSerializable, ArrayAccess
      */
     public function offsetUnset($offset)
     {
-        unset($this->response[$offset]);
+        unset($this->body[$offset]);
     }
 
     /** __get magic method implementation
@@ -147,6 +152,28 @@ class ApiResponse implements JsonSerializable, ArrayAccess
         $this->offsetSet($offset, $value);
     }
 
+    /**
+     * Offset to retrieve
+     * @link http://php.net/manual/en/arrayaccess.offsetget.php
+     */
+    public function offsetGet($offset)
+    {
+        return isset($this->body[$offset]) ? $this->body[$offset] : null;
+    }
+
+    /**
+     * Offset to set
+     * @link http://php.net/manual/en/arrayaccess.offsetset.php
+     */
+    public function offsetSet($offset, $value)
+    {
+        if ($offset === null) {
+            $this->body[] = $value;
+        } else {
+            $this->body[$offset] = $value;
+        }
+    }
+
     /** __isset magic method implementation
      * @param $name
      * @return bool
@@ -154,6 +181,15 @@ class ApiResponse implements JsonSerializable, ArrayAccess
     public function __isset($name)
     {
         return $this->offsetExists($name);
+    }
+
+    /**
+     * Whether a offset exists
+     * @link http://php.net/manual/en/arrayaccess.offsetexists.php
+     */
+    public function offsetExists($offset)
+    {
+        return isset($this->body[$offset]);
     }
 
 
