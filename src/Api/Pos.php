@@ -69,4 +69,36 @@ class Pos implements ApiInterface
     {
         return $this->merchantApi->call('get', 'pos/' . $pos_id)->toArray();
     }
+
+    /** Gets accounts bound to the specified POS
+     * @param $pos_id
+     * @return array
+     * @throws \Monetivo\Exceptions\MonetivoException
+     */
+    public function accounts($pos_id)
+    {
+        return $this->merchantApi->call('get', 'pos/' . $pos_id . '/accounts')->toArray();
+    }
+
+    /** Binds account to the specified POS
+     * @param $pos_id
+     * @param $account_id
+     * @return array
+     * @throws \Monetivo\Exceptions\MonetivoException
+     */
+    public function bindAccount($pos_id, $account_id)
+    {
+        return $this->merchantApi->call('post', 'pos/' . $pos_id . '/accounts/' . $account_id)->toArray();
+    }
+
+    /** Unbinds account from POS
+     * @param $pos_id
+     * @param $account_id
+     * @return array
+     * @throws \Monetivo\Exceptions\MonetivoException
+     */
+    public function unbindAccount($pos_id, $account_id)
+    {
+        return $this->merchantApi->call('delete', 'pos/' . $pos_id . '/accounts/' . $account_id)->toArray();
+    }
 }
