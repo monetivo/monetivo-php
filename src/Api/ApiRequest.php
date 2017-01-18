@@ -144,6 +144,9 @@ class ApiRequest {
         return $this->call('PUT', $url, $vars);
     }
 
+    /** Sets desired HTTP method
+     * @param $method
+     */
     protected function setMethod($method)
     {
         switch (strtoupper($method)) {
@@ -256,9 +259,17 @@ class ApiRequest {
         foreach ($this->headers as $key => $value) {
             $curl_headers[] = $key.': '.$value;
         }
+
         // add some helpful information about environment
-        $curl_headers[] = 'Curl-Version: '. $curl_version['version'];
-        $curl_headers[] = 'PHP-Version: '. phpversion();
+        $server_info = array(
+            'curl_version' => (isset($curl_version['version']) ? $curl_version['version'] : null),
+            'php_version' => phpversion(),
+            'php_sapi' => php_sapi_name()
+        );
+        $curl_headers[] = 'X-Server-Lang: PHP';
+        $curl_headers[] = 'X-Server-Lang-Info: ' . base64_encode(json_encode($server_info));
+        $curl_headers[] = 'X-Server-Software: '. (!empty($_SERVER['SERVER_SOFTWARE']) ? $_SERVER['SERVER_SOFTWARE'] : null);
+        $curl_headers[] = 'X-Server-Protocol: '. (!empty($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : null);
         curl_setopt($this->request, CURLOPT_HTTPHEADER, $curl_headers);
     }
 
