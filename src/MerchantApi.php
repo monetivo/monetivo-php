@@ -148,6 +148,23 @@ class MerchantApi
         return preg_match(self::APP_TOKEN_VALIDATION_REGEX, $token);
     }
 
+    /** Returns customer IP address
+     * @return mixed
+     */
+    private function getCustomerIP()
+    {
+        $ip = null;
+        if(array_key_exists('X-Forwarded-For', $_SERVER)) {
+            $ip = $_SERVER['X-Forwarded-For'];
+        } elseif(array_key_exists('HTTP_X_FORWARDED_FOR', $_SERVER)) {
+            $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } elseif(array_key_exists('REMOTE_ADDR', $_SERVER)) {
+            $ip = $_SERVER['REMOTE_ADDR'];
+        }
+
+        return $ip;
+    }
+
     /** Sets desired language; Defaults to 'en'
      * @param string $language
      * @throws MonetivoException
@@ -197,7 +214,8 @@ class MerchantApi
                 'User-Agent'           => self::USER_AGENT . ' ' . self::CLIENT_VERSION,
                 self::APP_TOKEN_HEADER => $this->app_token,
                 self::LANG_HEADER      => $this->language,
-                self::TIMEZONE_HEADER  => $this->timezone
+                self::TIMEZONE_HEADER  => $this->timezone,
+                'X-Customer-IP'           => $this->getCustomerIP()
             ]
         ];
 
