@@ -20,7 +20,7 @@ use Monetivo\Exceptions\MonetivoException;
  * Monetivo Merchant API client
  * @author Grzegorz Agaciński <gagacinski@monetivo.com>
  * @author Jakub Jasiulewicz <jjasiulewicz@monetivo.com>
- * @see  https://docs.monetivo.com/f
+ * @see  https://docs.monetivo.com/
  * @package Monetivo
  */
 class MerchantApi
@@ -29,7 +29,7 @@ class MerchantApi
     /**
      * Merchant API client version
      */
-    const CLIENT_VERSION = '1.0.4';
+    const CLIENT_VERSION = '1.0.5';
 
     /**
      * Name of request headers
