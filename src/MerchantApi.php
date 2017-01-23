@@ -20,7 +20,7 @@ use Monetivo\Exceptions\MonetivoException;
  * Monetivo Merchant API client
  * @author Grzegorz Agaciński <gagacinski@monetivo.com>
  * @author Jakub Jasiulewicz <jjasiulewicz@monetivo.com>
- * @see  https://docs.monetivo.com/
+ * @see  https://docs.monetivo.com/f
  * @package Monetivo
  */
 class MerchantApi
@@ -48,11 +48,11 @@ class MerchantApi
     /**
      * Monetivo Merchant API endpoint URL
      */
-    const API_ENDPOINT = 'https://api.monetivo.com/';
+    const API_PRODUCTION_ENDPOINT = 'https://api.monetivo.com/';
     /**
      * Monetivo Merchant Sandbox API endpoint URL
      */
-    const SANDBOX_API_ENDPOINT = '';
+    const API_SANDBOX_ENDPOINT = '';
 
     /**
      * @var string
@@ -100,6 +100,8 @@ class MerchantApi
      */
     public function __construct($app_token = '', $language = 'pl', $timezone = self::DEFAULT_TIMEZONE)
     {
+        // by default, send all requests to the production API
+        $this->current_api_endpoint = self::API_PRODUCTION_ENDPOINT;
         $this->setAppToken($app_token);
         $this->setLanguage($language);
         $this->setTimezone($timezone);
@@ -111,7 +113,30 @@ class MerchantApi
      */
     public function getBaseAPIEndpoint()
     {
-        return self::API_ENDPOINT . 'v' . $this->api_version . '/';
+        return $this->current_api_endpoint . 'v' . $this->api_version . '/';
+    }
+
+    /** Overrides URL to the API.
+     * @param $url
+     * @throws \Monetivo\Exceptions\MonetivoException
+     */
+    public function setBaseAPIEndpoint($url)
+    {
+        $url = strtolower($url);
+        if(substr($url, 0, strlen('https://')) !== 'https://')
+            throw new MonetivoException('Endpoint address should start with https://');
+
+        $this->current_api_endpoint = rtrim($url, '/').'/';
+        $this->initClient();
+    }
+
+    /**
+     * Sets sandbox mode
+     * @throws \Monetivo\Exceptions\MonetivoException
+     */
+    public function setSandboxMode()
+    {
+        $this->setBaseAPIEndpoint(self::API_SANDBOX_ENDPOINT);
     }
 
     /** Sets target API version
