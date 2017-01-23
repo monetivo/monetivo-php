@@ -38,7 +38,7 @@ class Payouts implements ApiInterface
      * @return mixed
      * @throws \Monetivo\Exceptions\MonetivoException
      */
-    public function list()
+    public function listing()
     {
         return $this->merchantApi->call('get', 'payouts')->toArray();
     }

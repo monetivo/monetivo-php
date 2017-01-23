@@ -29,7 +29,7 @@ class Offer implements ApiInterface
      * @return array
      * @throws \Monetivo\Exceptions\MonetivoException
      */
-    public function list($type)
+    public function listing($type)
     {
         return $this->merchantApi->call('get', 'offer/'.$type)->toArray();
     }

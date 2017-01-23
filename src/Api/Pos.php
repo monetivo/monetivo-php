@@ -27,7 +27,7 @@ class Pos implements ApiInterface
      * @return array
      * @throws \Monetivo\Exceptions\MonetivoException
      */
-    public function list()
+    public function listing()
     {
         return $this->merchantApi->call('get', 'pos/')->toArray();
     }

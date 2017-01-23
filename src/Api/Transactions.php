@@ -108,7 +108,7 @@ class Transactions implements ApiInterface
      * @return array
      * @throws \Monetivo\Exceptions\MonetivoException
      */
-    public function list(array $pagination_settings = [])
+    public function listing(array $pagination_settings = [])
     {
         $pagination_settings = (count($pagination_settings) > 0) ?  '?'.http_build_query($pagination_settings) : '';
         return $this->merchantApi->call('get', 'transactions/'.$pagination_settings)->toArray();
