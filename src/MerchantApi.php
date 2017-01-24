@@ -29,7 +29,7 @@ class MerchantApi
     /**
      * Merchant API client version
      */
-    const CLIENT_VERSION = '1.0.5';
+    const CLIENT_VERSION = '1.0.6';
 
     /**
      * Name of request headers
@@ -52,7 +52,7 @@ class MerchantApi
     /**
      * Monetivo Merchant Sandbox API endpoint URL
      */
-    const API_SANDBOX_ENDPOINT = '';
+    const API_SANDBOX_ENDPOINT = ''; //todo update the url
 
     /**
      * @var string
@@ -93,7 +93,7 @@ class MerchantApi
 
     /**
      * MerchantApi constructor
-     * @param string $app_token
+     * @param string $app_token required
      * @param string $language
      * @param string $timezone See https://secure.php.net/manual/en/timezones.php
      * @throws MonetivoException
@@ -116,15 +116,17 @@ class MerchantApi
         return $this->current_api_endpoint . 'v' . $this->api_version . '/';
     }
 
-    /** Overrides URL to the API.
+    /** Overrides URL to the API (optionally)
+     * Endpoint address should start with https://
      * @param $url
      * @throws \Monetivo\Exceptions\MonetivoException
      */
     public function setBaseAPIEndpoint($url)
     {
         $url = strtolower($url);
-        if(substr($url, 0, strlen('https://')) !== 'https://')
+        if(substr($url, 0, strlen('https://')) !== 'https://') {
             throw new MonetivoException('Endpoint address should start with https://');
+        }
 
         $this->current_api_endpoint = rtrim($url, '/').'/';
         $this->initClient();
@@ -139,7 +141,7 @@ class MerchantApi
         $this->setBaseAPIEndpoint(self::API_SANDBOX_ENDPOINT);
     }
 
-    /** Sets target API version
+    /** Sets target API version (optionally)
      * @param string $version
      */
     public function setAPIversion($version = '1')
@@ -151,7 +153,17 @@ class MerchantApi
         }
     }
 
-    /**
+    /** Sets name of your software platform used in custom integrations (optionally).
+     * This name will be send as a request's header along other headers.
+     * It is used mainly in plugins.
+     * @param $platform
+     */
+    public function setPlatform($platform)
+    {
+        $this->api_client->options['headers']['X-Platform'] = $platform;
+    }
+
+    /** Sets application token
      * @param string $app_token
      * @throws MonetivoException
      */
@@ -219,15 +231,8 @@ class MerchantApi
     }
 
     /**
-     * Initialize API client with custom params and custom handler, both null by default
+     * Initialize API client with custom params and custom handler, both empty by default
      * @param array $custom_params See ApiRequest->setOptions()
-     * Main usage - provide Monetivo with ecomm platform:
-     *      $custom_params = [
-     *          'headers' => [
-     *              'Platform-Name' => '',
-     *              'Platform-Version' => ''
-     *          ]
-     *      ];
      * @param null $custom_handler
      */
     public function initClient($custom_params = [], $custom_handler = null)
@@ -257,7 +262,9 @@ class MerchantApi
         return $this->api_client;
     }
 
-    /**
+    /** Authenticates user
+     * After successful authentication authorization token is set automatically. Further calls are no longer required.
+     * @url https://merchant.monetivo.com visit to obtain credentials
      * @param $login
      * @param $password
      * @return mixed
@@ -272,6 +279,7 @@ class MerchantApi
             ]
         ]);
 
+        // check if token is present
         if (!isset($response['token'])) {
             if (isset($response['errors']) || isset($response['code'])) {
                 $error_message = isset($response['code']) ? $response['message'] : $response['errors'][0]['message'];
@@ -314,8 +322,11 @@ class MerchantApi
             ]);
         }
 
+        // call API
         /** @var ApiResponse $response */
         $response = $this->api_client->$method(ltrim($route, '/'), $params);
+
+        // try to automatically renew a token
         $this->autoRenewAuthToken($response);
 
         // throw an exception if response was not 2xx
@@ -342,7 +353,10 @@ class MerchantApi
     }
 
     /**
-     * Used to inject token directly without auth
+     * Used to inject token directly without auth (optionally).
+     * If you call auth() then token is set automatically after successful authentication.
+     * If you store your token somehow (e.g. in cache) then you can programmatically set the token with this method thus calling auth() is unnecesary (unless token is expired).
+     * REMEMBER that token is valid only for some time. Store your token securely for a limited time.
      * @param string $token
      * @throws MonetivoException
      */
@@ -357,8 +371,8 @@ class MerchantApi
     }
 
     /** Enables logging communication with API to file
-     * USE WITH CAUTION! Some sensitive infos will be included in log file. Make sure that the file is protected or delete it after debugging session is finished.
-     * infos about subsequent requests will be appended to the end of the file
+     * USE WITH CAUTION! Some sensitive data will be included in log file. Make sure that the file is protected or delete it after debugging session is finished.
+     * Data about subsequent requests will be appended to the end of the file
      * @param $log_file
      */
     public function enableLogging($log_file)

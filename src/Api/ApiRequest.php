@@ -212,7 +212,7 @@ class ApiRequest {
         $httpCode = curl_getinfo($this->request, CURLINFO_HTTP_CODE);
 
         // split returned response string into headers and body
-        list($headers, $body) = $this->parseResponse($response);
+        list($headers, $body) = $this->prepareResponse($response);
 
         if($response === false) {
             throw new MonetivoException('API error: '.curl_errno($this->request).' - '.curl_error($this->request), 0, $httpCode);
@@ -230,14 +230,14 @@ class ApiRequest {
         return $response;
     }
 
-    /** Parses the response
+    /** Prepares the response for parsing
      * @param $response
      * @return array
      */
-    protected function parseResponse($response)
+    protected function prepareResponse($response)
     {
         $header_size = curl_getinfo($this->request, CURLINFO_HEADER_SIZE);
-        $headers = substr($response, 0, $header_size); //todo parse headers
+        $headers = substr($response, 0, $header_size);
         $body = substr($response, $header_size);
 
         return [$headers, $body];
