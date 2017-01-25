@@ -278,7 +278,7 @@ class ApiRequest {
      */
     public function setBaseUri($base_uri)
     {
-        $this->base_uri = $base_uri;
+        $this->options['base_uri'] = $base_uri;
     }
 
     /** Enables logging to file by setting log file location

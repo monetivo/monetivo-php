@@ -129,7 +129,7 @@ class MerchantApi
         }
 
         $this->current_api_endpoint = rtrim($url, '/').'/';
-        $this->initClient();
+        $this->api_client->setBaseUri($this->getBaseAPIEndpoint());
     }
 
     /**
