@@ -160,7 +160,7 @@ class MerchantApi
      */
     public function setPlatform($platform)
     {
-        $this->api_client->options['headers']['X-Platform'] = $platform;
+        $this->api_client->setPlatform($platform);
     }
 
     /** Sets application token

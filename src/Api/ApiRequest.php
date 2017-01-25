@@ -281,6 +281,15 @@ class ApiRequest {
         $this->options['base_uri'] = $base_uri;
     }
 
+    /** Sets additional header with client's custom software name
+     * @param $platform
+     */
+    public function setPlatform($platform)
+    {
+        $this->options['headers']['X-Platform'] = $platform;
+
+    }
+
     /** Enables logging to file by setting log file location
      * @param string $log_file
      */
