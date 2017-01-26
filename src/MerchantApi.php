@@ -52,7 +52,7 @@ class MerchantApi
     /**
      * Monetivo Merchant Sandbox API endpoint URL
      */
-    const API_SANDBOX_ENDPOINT = ''; //todo update the url
+    const API_SANDBOX_ENDPOINT = 'https://api.monetivo.io/';
 
     /**
      * @var string
