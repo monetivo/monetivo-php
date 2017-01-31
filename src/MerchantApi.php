@@ -29,7 +29,7 @@ class MerchantApi
     /**
      * Merchant API client version
      */
-    const CLIENT_VERSION = '1.0.6';
+    const CLIENT_VERSION = '1.0.7';
 
     /**
      * Name of request headers
