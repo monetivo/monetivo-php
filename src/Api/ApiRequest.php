@@ -181,9 +181,9 @@ class ApiRequest {
 
         // enable logging to file
         if(!empty($this->log_file)) {
-            $f = fopen($this->log_file, 'a');
-            curl_setopt($this->request, CURLOPT_VERBOSE, true);
-            curl_setopt($this->request, CURLOPT_STDERR, $f);
+            $f = @fopen($this->log_file, 'a');
+            @curl_setopt($this->request, CURLOPT_VERBOSE, true);
+            @curl_setopt($this->request, CURLOPT_STDERR, $f);
         }
 
         // if the base uri was included in options, treat url as a relative url

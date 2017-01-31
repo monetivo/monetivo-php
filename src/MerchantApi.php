@@ -41,7 +41,7 @@ class MerchantApi
 
     const USER_AGENT = 'monetivo/monetivo-php';
 
-    const APP_TOKEN_VALIDATION_REGEX = '/^[a-f0-9]{8}-[a-f0-9]{4}-4{1}[a-f0-9]{3}-[89ab]{1}[a-f0-9]{3}-[a-f0-9]{12}$/';
+    const APP_TOKEN_VALIDATION_REGEX = '/^(test_|prod_)?[a-f0-9]{8}-[a-f0-9]{4}-4{1}[a-f0-9]{3}-[89ab]{1}[a-f0-9]{3}-[a-f0-9]{12}$/';
 
     const DEFAULT_TIMEZONE = 'Europe/Warsaw';
 
@@ -100,8 +100,6 @@ class MerchantApi
      */
     public function __construct($app_token = '', $language = 'pl', $timezone = self::DEFAULT_TIMEZONE)
     {
-        // by default, send all requests to the production API
-        $this->current_api_endpoint = self::API_PRODUCTION_ENDPOINT;
         $this->setAppToken($app_token);
         $this->setLanguage($language);
         $this->setTimezone($timezone);
@@ -129,11 +127,13 @@ class MerchantApi
         }
 
         $this->current_api_endpoint = rtrim($url, '/').'/';
-        $this->api_client->setBaseUri($this->getBaseAPIEndpoint());
+        if($this->api_client !== null)
+            $this->api_client->setBaseUri($this->getBaseAPIEndpoint());
     }
 
     /**
-     * Sets sandbox mode
+     * Sets sandbox mode explicitly (optionally)
+     * Environment is determined by app token
      * @throws \Monetivo\Exceptions\MonetivoException
      */
     public function setSandboxMode()
@@ -163,26 +163,34 @@ class MerchantApi
         $this->api_client->setPlatform($platform);
     }
 
-    /** Sets application token
+    /** Sets environment (production or sandbox) based on application token
+     * each token is prefixed with "test_" or "prod_" prefixes
+     * @param $app_token
+     * @throws \Monetivo\Exceptions\MonetivoException
+     */
+    private function setEnvironment($app_token)
+    {
+        // by default, send all requests to the production API
+        $this->setBaseAPIEndpoint(self::API_PRODUCTION_ENDPOINT);
+
+        if(strpos(strtolower($app_token), 'test') !== false) {
+            $this->setBaseAPIEndpoint(self::API_SANDBOX_ENDPOINT);
+        }
+    }
+
+    /** Sets application token and environment
      * @param string $app_token
      * @throws MonetivoException
      */
     private function setAppToken($app_token)
     {
-        if (!$this->validateToken($app_token)) {
+        if (!preg_match(self::APP_TOKEN_VALIDATION_REGEX, $app_token)) {
             throw new MonetivoException('App token format is invalid');
         }
         $this->app_token = $app_token;
-    }
 
-    /**
-     * Local validation of Merchant App token
-     * @param string $token
-     * @return int
-     */
-    private function validateToken($token)
-    {
-        return preg_match(self::APP_TOKEN_VALIDATION_REGEX, $token);
+        // determine proper environment
+        $this->setEnvironment($app_token);
     }
 
     /** Returns customer IP address
