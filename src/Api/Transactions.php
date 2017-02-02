@@ -73,22 +73,9 @@ class Transactions implements ApiInterface
      */
     public function create(array $params = [])
     {
-        $required = [
-            'pos_id',
-            'order_data',
-            'buyer',
-            'language',
-            'currency',
-            'amount',
-            'return_url'
-        ];
-        foreach ($required as $name) {
-            if (empty($params[$name])) {
-                throw new MonetivoException('Invalid ' . __FUNCTION__ . ' params: ' . $name);
-            }
+        if(!empty($params['currency'])) {
+            $params['currency'] = strtoupper(trim($params['currency']));
         }
-
-        $params['currency'] = strtoupper($params['currency']);
 
         $response = $this->merchantApi->call('post', 'transactions', [
             'form_params' => $params
