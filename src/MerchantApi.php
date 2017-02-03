@@ -381,7 +381,7 @@ class MerchantApi
 
         $this->auth_token = $token;
 
-        if(is_callable($this->callbacks[__FUNCTION__]))
+        if(!empty($this->callbacks[__FUNCTION__]) && is_callable($this->callbacks[__FUNCTION__]))
             ($this->callbacks[__FUNCTION__])($token);
 
     }
