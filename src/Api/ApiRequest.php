@@ -111,6 +111,12 @@ class ApiRequest {
      * @throws \Monetivo\Exceptions\MonetivoException
      */
     public function get($url, array $vars = []) {
+        // concat form_params to url if get method
+        if(!empty($vars['form_params'])) {
+            $url .= '?'.http_build_query($vars['form_params']);
+            // don't forward it
+            unset($vars['form_params']);
+        }
         return $this->call('GET', $url, $vars);
     }
 
