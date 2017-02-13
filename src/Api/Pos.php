@@ -24,12 +24,14 @@ class Pos implements ApiInterface
     }
 
     /** Lists POS
+     * @param array $pagination_settings
      * @return array
      * @throws \Monetivo\Exceptions\MonetivoException
      */
-    public function listing()
+    public function listing(array $pagination_settings = [])
     {
-        return $this->merchantApi->call('get', 'pos/')->toArray();
+        $pagination_settings = (count($pagination_settings) > 0) ?  '?'.http_build_query($pagination_settings) : '';
+        return $this->merchantApi->call('get', 'pos/'.$pagination_settings)->toArray();
     }
 
     /** Creates a POS
