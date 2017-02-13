@@ -29,7 +29,7 @@ class MerchantApi
     /**
      * Merchant API client version
      */
-    const CLIENT_VERSION = '1.0.8';
+    const CLIENT_VERSION = '1.0.9';
 
     /**
      * Name of request headers
@@ -381,8 +381,10 @@ class MerchantApi
 
         $this->auth_token = $token;
 
-        if(!empty($this->callbacks[__FUNCTION__]) && is_callable($this->callbacks[__FUNCTION__]))
-            ($this->callbacks[__FUNCTION__])($token);
+        // invoke callback
+        if(!empty($this->callbacks[__FUNCTION__]) && is_callable($this->callbacks[__FUNCTION__])) {
+            $this->callbacks[__FUNCTION__]($token);
+        }
 
     }
 
