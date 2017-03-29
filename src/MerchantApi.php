@@ -11,6 +11,7 @@ use Monetivo\Api\BankAccounts;
 use Monetivo\Api\Contacts;
 use Monetivo\Api\ContactsTemplates;
 use Monetivo\Api\Offer;
+use Monetivo\Api\PaymentChannels;
 use Monetivo\Api\Payouts;
 use Monetivo\Api\Pos;
 use Monetivo\Api\Transactions;
@@ -438,6 +439,14 @@ class MerchantApi
     public function transactions()
     {
         return new Transactions($this);
+    }
+
+    /** Payment channels
+     * @return PaymentChannels
+     */
+    public function paymentChannels()
+    {
+        return new PaymentChannels($this);
     }
 
     /** Addresses
