@@ -50,6 +50,6 @@ class PaymentChannels implements ApiInterface
     public function listing($currency, array $types = [])
     {
         $types = implode(',', $types);
-        return $this->merchantApi->call('get', sprintf('paymentChannels?currency=%s&type=%s', strtoupper($currency), $types))->toArray();
+        return $this->merchantApi->call('get', sprintf('channels?currency=%s&type=%s', strtoupper($currency), $types))->toArray();
     }
 }
