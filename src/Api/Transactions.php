@@ -135,20 +135,22 @@ class Transactions implements ApiInterface
     }
 
     /** Refunds the transaction
-     * @param array $transaction
+     * @param array $params
      * @return array
      * @throws \Monetivo\Exceptions\MonetivoException
      */
-    public function refund(array $transaction)
+    public function refund(array $params)
     {
         // transaction identifier must be set
-        if(!isset($transaction['identifier']))
+        if(!isset($params['identifier']))
         {
             throw new MonetivoException('$transaction["identifier"] is not set');
         }
-        // other parameters like 'refund_amount' and 'desc' are optional
+        // other parameters like 'amount' and 'description' are optional
 
-        return $this->merchantApi->call('post', 'transactions/' . $transaction['identifier'] . '/refund', $transaction)->toArray();
+        return $this->merchantApi->call('post', 'transactions/' . $params['identifier'] . '/refund', [
+            'form_params' => $params
+        ])->toArray();
     }
 
 
