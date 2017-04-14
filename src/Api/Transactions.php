@@ -153,6 +153,23 @@ class Transactions implements ApiInterface
         ])->toArray();
     }
 
+    /** Executes payment using BLIK
+     * Transaction must be registered already using create() method.
+     * CAUTION: Method can return one of two values: ['status' => true] or ['status' => false]
+     * Result ['status' => true] does not mean that transaction is finalized. You have to still wait for the callback.
+     * See handleCallback() method to know how to properly handle notification sent by Monetivo.
+     * @param $identifier
+     * @param $blik_code
+     * @return array
+     * @throws \Monetivo\Exceptions\MonetivoException
+     */
+    public function executeBlik($identifier, $blik_code)
+    {
+        return $this->merchantApi->call('post', 'transactions/' . $identifier . '/blik',  [
+            'form_params' => ['blikCode' => $blik_code]
+        ])->toArray();
+    }
+
 
 
 }
