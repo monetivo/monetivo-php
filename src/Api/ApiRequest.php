@@ -59,7 +59,7 @@ class ApiRequest {
         return [
             'followlocation' => true,
             'connecttimeout' => 20,
-            'timeout' => 60,
+            'timeout' => 120,
             'header' => true,
             'returntransfer' => true,
         ];
